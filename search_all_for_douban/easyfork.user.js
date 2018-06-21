@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name         [skypesky 出品]豆瓣助手
 // @namespace    http://www.skypesky.cn/userjs/search_subtitle_for_douban
-// @version      18.06.01
+// @version      18.06.21
 // @description  目前只支持电影搜索,后续会加入更多功能
 // @author       skypesky
 // @include      http*://movie.douban.com/subject/*
 // @grant        GM_xmlhttpRequest
+// @updateURL https://greasyfork.org/scripts/369682-skypesky-%E5%87%BA%E5%93%81-%E8%B1%86%E7%93%A3%E5%8A%A9%E6%89%8B/code/%5Bskypesky%20%E5%87%BA%E5%93%81%5D%E8%B1%86%E7%93%A3%E5%8A%A9%E6%89%8B.user.js
 
 // ==========================connect===========================
 // @connect      *
@@ -89,7 +90,7 @@ const Server = {
                     clearInterval(task);
                 } else {
                     this.addEmptyStyle("抱歉,这部电影未找到适配的下载源!");
-                }   
+                }
             }
         }, 50);
 
