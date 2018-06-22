@@ -105,8 +105,11 @@ const Server = {
     },
     // 添加样式
     addStyle: function (data) {
+
         let table = `<br /><hr style="border: 1px solid #e5e5e5" />`;
+
         table += `<table style='text-align: center; padding: 14px; width: 100%;'>`;
+
         for (let i = 0; i < data.length; i = i + config.showLength) {
 
             table += `<tr>`;
@@ -117,9 +120,12 @@ const Server = {
 
             table += `</tr>`;
         }
+
         table += `</table>`;
         table += `<hr style="border: 1px solid #e5e5e5" /><br />`;
+
         $(`.subjectwrap`).after(table);
+        
     },
     addEmptyStyle: function (message) {
         let table = `<br /><hr style="border: 1px solid #e5e5e5" />`;
