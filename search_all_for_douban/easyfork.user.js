@@ -16,7 +16,7 @@
 
 // 全局变量
 const config = {
-    keyword: `keyword`,
+    keyword: `#keyword#`,
     showLength: 5
 };
 
@@ -25,66 +25,151 @@ const config = {
 
     'use strict';
 
-
-    const subtitleMap = [
-        {
-            url: `http://www.rs05.com/search.php?s=${config.keyword}`,
+    // 影片资源
+    const VideoResourceList = [{
             name: `RS05`,
-            success: {
-                selector: `#movielist .pure-g`,
-            }
+            url: `http://www.rs05.com/search.php?s=${config.keyword}`,
+            successElement: `#movielist .pure-g`
         },
         {
-            url: `http://www.iloldytt.cc/search.html?title=${config.keyword}`,
+            name: `看天堂`,
+            url: `http://www.kantiantang.com/search?text=${config.keyword}`,
+            successElement: `.col-md-8 .page-header`
+        },
+        {
             name: `电影天堂`,
-            success: {
-                selector: `browse-inner .img-responsive`,
-            }
+            url: `http://www.iloldytt.cc/search.html?title=${config.keyword}`,
+            successElement: `browse-inner .img-responsive`,
         },
         {
-            url: `https://www.qpg123.com/search/?wd=${config.keyword}`,
             name: `青苹果影院`,
-            success: {
-                selector: `img.lazy`,
-            }
+            url: `https://www.qpg123.com/search/?wd=${config.keyword}`,
+            successElement: `img.lazy`
         },
         {
-            url: `http://www.xunyingwang.com/search?q=${config.keyword}`,
             name: `迅影网`,
-            success: {
-                selector: `.img-thumbnail`,
-            }
+            url: `http://www.xunyingwang.com/search?q=${config.keyword}`,
+            successElement: `.img-thumbnail`
         },
         {
-            url: `http://www.bd-film.co/search.jspx?q=${config.keyword}`,
             name: `BD影视`,
-            success: {
-                selector: `.list-item`,
-            }
+            url: `http://www.bd-film.co/search.jspx?q=${config.keyword}`,
+            successElement: `.list-item`
         }
     ];
+
+    // 字幕资源
+    const SubtitleResourceList = [{
+            name: `aaa字幕`,
+            url: ``,
+            successElement: ``
+        },
+        {
+            name: `bbb字幕`,
+            url: `zsc`,
+            successElement: ``
+        }
+    ];
+
+    // 作用的网站
+    const WebsiteList = [{
+        name: `豆瓣网站`,
+        url: ``,
+        rule: /test/,
+        enable: true
+    }];
+
     $(function () {
-        Server.run(subtitleMap);
-    })
+        Server.run(WebsiteList);
+    });
+
 })();
+
+
+const Resource = {
+
+    // 未替换的搜索链接
+    _originUrl = ``,
+    // 搜索资源的关键字
+    _keyword = ``,
+    // 资源检索成功的元素的选择器
+    _successSelector = ``,
+    // 真实的地址
+    _realUrl = ``,
+
+    /**
+     ** @desc: 初始化参数
+     ** @param: originUrl => 未替换的搜索链接
+     **         keyword => 查询的关键字
+     **         successSelector => 资源检索成功的元素的选择器
+     ** 
+     */
+    init: function (originUrl, keyword, successSelector) {
+        this._originUrl = originUrl;
+        this._keyword = keyword;
+        this._successSelector = successSelector;
+    },
+
+    /**
+     ** @desc: 检测资源是否存在,存在返回true,不存在返回false
+     ** @param: selector => 选择器
+     **         responseText => 响应的html文本信息
+     ** @return: 资源存在返回true,否则否则返回false
+     */
+    exist: function (responseText) {
+        return $(this._successSelector, responseText).length > 0;
+    },
+
+    /**
+     ** @desc: 通过替换字符串,获取真实的查询网址
+     ** @param:
+     ** @return: 返回真实的查询网址
+     */
+    getRealUrl: function () {
+        this._realUrl = this._originUrl.replace(config.keyword, this._keyword);
+        return this._realUrl;
+    },
+
+    /**
+     ** @desc: 检索资源,检索成功返回真实链接,检索失败返回null 
+     ** @param: callback => 回调函数的地址引用
+     ** @return: 
+     */
+    search: function (callback) {
+        GM_xmlhttpRequest({
+            method: `GET`,
+            url: this._realUrl,
+            data: {
+                title: this._keyword
+            },
+            onload: (result) => {
+                // 回调函数
+                callback(result);
+            }
+        });
+    }
+
+};
+
+
 
 const Server = {
     videoSearchList: [],
     title: null,
     //计数器
     count: 0,
-    run: function (subtitleMap) {
+    run: function (ResourceList) {
         // 初始化计数器
         this.count = 0;
         // get title
         this.title = this.getTitle();
 
-        for (let i = 0; i < subtitleMap.length; ++i) {
-            this.getData(subtitleMap[i]);
+        for (let i = 0; i < ResourceList.length; ++i) {
+            this.getData(ResourceList[i]);
         }
 
         let task = setInterval(() => {
-            if (this.count == subtitleMap.length) {
+            if (this.count == ResourceList.length) {
                 if (this.videoSearchList.length > 0) {
                     this.addStyle(this.videoSearchList);
                     clearInterval(task);
@@ -125,7 +210,7 @@ const Server = {
         table += `<hr style="border: 1px solid #e5e5e5" /><br />`;
 
         $(`.subjectwrap`).after(table);
-        
+
     },
     addEmptyStyle: function (message) {
         let table = `<br /><hr style="border: 1px solid #e5e5e5" />`;
@@ -166,12 +251,11 @@ const Server = {
 // 验证工具类
 const Validate = {
     /*
-    ** @desc: 验证对象
-    ** @param: object
-    ** @return: object不为null且不为undefined时返回true,否则返回false
-    */
+     ** @desc: 验证对象
+     ** @param: object
+     ** @return: object不为null且不为undefined时返回true,否则返回false
+     */
     checkObject: function (object) {
-        console.log(!object);
         if (!object || object == undefined) {
             return false;
         }

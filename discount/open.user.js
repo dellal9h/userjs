@@ -1,11 +1,11 @@
 // ==UserScript==
-// @name         [skypesky 出品]支持手机扫描二维码领取优惠券 淘宝天猫购物优惠券 优惠券 省钱必备工具 最新版(2018-06-21) 
+// @namespace    https://openuserjs.org/user/skypesky
+// @name         (skypesky.cn) 淘宝天猫购物优惠券 搜券助手 省钱必备工具
 // @author       skypesky
 // @collaborator liang
-// @namespace    http://www.skypesky.cn
-// @version      18.06.21
-// @description  帮助淘宝天猫用户查询当前商品的优惠券
-// @updateURL    https://greasyfork.org/scripts/40146-taobao-%E6%B7%98%E5%AE%9D%E5%A4%A9%E7%8C%AB%E8%B4%AD%E7%89%A9%E5%8A%A9%E6%89%8B-%E4%BC%98%E6%83%A0%E5%88%B8%E5%8A%A9%E6%89%8B-%E6%94%AF%E6%8C%81%E6%89%AB%E7%A0%81%E9%A2%86%E5%88%B8-%E7%9C%81%E9%92%B1%E5%BF%85%E5%A4%87%E5%B7%A5%E5%85%B7-%E6%9C%80%E6%96%B0%E7%89%88-2018-05-18-skypesky/code/taobao%20%E6%B7%98%E5%AE%9D%E5%A4%A9%E7%8C%AB%E8%B4%AD%E7%89%A9%E5%8A%A9%E6%89%8B%20%E4%BC%98%E6%83%A0%E5%88%B8%E5%8A%A9%E6%89%8B%20%E6%94%AF%E6%8C%81%E6%89%AB%E7%A0%81%E9%A2%86%E5%88%B8%20%E7%9C%81%E9%92%B1%E5%BF%85%E5%A4%87%E5%B7%A5%E5%85%B7%20%E6%9C%80%E6%96%B0%E7%89%88(20180518)%20%5Bskypesky%5D.user.js
+// @copyright    2018, skypesky (https://openuserjs.org/users/skypesky)
+// @version      18.06.24
+// @description  [skypesky 出品]支持手机扫描二维码领取优惠券 淘宝天猫购物优惠券 优惠券 省钱必备工具 最新版(2018-06-24) 
 
 // ==========================详情页===========================
 // @include      http*://s.taobao.com/search*
@@ -19,14 +19,14 @@
 // @include      http*://chaoshi.detail.tmall.com/*
 // @include      http*://detail.tmall.hk/*
 // @include      http*://detail.yao.95095.com/item.htm*
-// @include      http*://www.taobao.com/*
 
+// @license Apache-2.0
 // @grant        none
 // @require      https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js
 // @require      https://cdn.bootcss.com/jquery.qrcode/1.0/jquery.qrcode.min.js
 // @require      https://cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.js
 
-// ==/UserScript==
+// ==/UserScript== 
 
 (function () {
     'use strict';
