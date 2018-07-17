@@ -4,8 +4,15 @@
 // @author       skypesky
 // @collaborator liang
 // @copyright    2018, skypesky (https://openuserjs.org/users/skypesky)
-// @version      18.06.24
-// @description  [skypesky 出品]支持手机扫描二维码领取优惠券 淘宝天猫购物优惠券 优惠券 省钱必备工具 最新版(2018-06-24) 
+// @version      18.07.17
+// @description  [skypesky 出品]支持手机扫描二维码领取优惠券 淘宝天猫购物优惠券 优惠券 省钱必备工具 最新版(2018-07-17) 
+
+// @license Apache-2.0
+
+// @connect      *
+// @grant        GM_getResourceText
+// @grant        GM_addStyle
+
 
 // ==========================详情页===========================
 // @include      http*://s.taobao.com/search*
@@ -20,19 +27,44 @@
 // @include      http*://detail.tmall.hk/*
 // @include      http*://detail.yao.95095.com/item.htm*
 
-// @license Apache-2.0
-// @grant        none
+// ==========================资源============================
+// @resource     toastr https://cdn.bootcss.com/izitoast/1.3.0/css/iziToast.min.css
+// @resource     contexMenu https://cdn.bootcss.com/jquery-contextmenu/2.6.1/jquery.contextMenu.min.css
+
+
+// ==========================js============================
 // @require      https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js
 // @require      https://cdn.bootcss.com/jquery.qrcode/1.0/jquery.qrcode.min.js
 // @require      https://cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.js
+// @require      https://cdn.bootcss.com/jquery-contextmenu/2.6.1/jquery.contextMenu.min.js
+// @require      https://cdn.bootcss.com/izitoast/1.3.0/js/iziToast.min.js
+
 
 // ==/UserScript== 
 
+
+const config = {
+    successClassTag: `skypesky-search-success`,
+    errorClassTag: `skypesky-search-error`,
+    requestApi: {
+        url: "https://skypesky.cn/api/search",
+        method: "POST"
+    }
+};
+
+
+
 (function () {
+
     'use strict';
 
-    const SingleProductList = [
-        {
+    //导入的样式
+    const cssList = [
+        "contexMenu",
+        "toastr"
+    ];
+
+    const SingleProductList = [{
             'webUrl': 'http*://item.taobao.com/*',
             'testUrl': [
                 'https://detail.tmall.com/item.htm?spm=a230r.1.14.49.540ebfacqvEYTO&id=567321234000&ns=1&abbucket=19&sku_properties=5919063:6536025'
@@ -89,8 +121,7 @@
         },
     ];
 
-    const SearchProductList = [
-        {
+    const SearchProductList = [{
             'webUrl': 'https://s.taobao.com/search/*',
             'testUrl': [
                 'https://s.taobao.com/search?q=%E8%83%8C%E5%8C%85&imgfile=&js=1&stats_click=search_radio_all%3A1&initiative_id=staobaoz_20180530&ie=utf8'
@@ -106,13 +137,16 @@
             },
             'image': {
                 'selector': '.pic-box-inner'
+            },
+            'product': {
+                'selector': '.J_MouserOnverReq',
             }
         },
         {
             'webUrl': 'http*://list.tmall.hk/search_product.htm*from=yao..pc_1_searchbutton',
             'description': '天猫医药馆直接搜索',
             'testUrl': [
-                'https://list.tmall.com/search_product.htm?spm=a220m.1000858.1000723.3.70424fc5QClXuA&&from=rs_1_key-top-s&q=%D1%F8%CE%B8%D4%E7%B2%CD'
+                'https://list.tmall.com/search_product.htm?spm=a222y.22577.6850814529.3.60042883GjWeq6&abbucket=&cat=53350009&acm=lb-zebra-22578-290927.1003.8.426589&aldid=176543&q=%B2%B9%C9%F6&abtest=&scm=1003.8.lb-zebra-22578-290927.ITEM_14466834623622_426589'
             ],
             'rule': /\/\/list.tmall.com\/search_product.htm[\s\S]*from=yao..pc_1_searchbutton/,
             'id': {
@@ -124,6 +158,9 @@
             },
             'image': {
                 'selector': '.productImg-wrap'
+            },
+            'product': {
+                'selector': 'div.product',
             }
         },
         {
@@ -143,6 +180,9 @@
             },
             'image': {
                 'selector': '.product-img'
+            },
+            'product': {
+                'selector': 'li.product',
             }
         },
         {
@@ -161,6 +201,9 @@
             },
             'image': {
                 'selector': '.productImg-wrap'
+            },
+            'product': {
+                'selector': 'div.product',
             }
         },
         {
@@ -180,13 +223,21 @@
             },
             'image': {
                 'selector': '.productImg-wrap'
+            },
+            'product': {
+                'selector': 'div.product[data-id]'
             }
         }
     ];
 
     $(function () {
+        $('body').css('background', '#F4F4F4');
+        // 添加样式
+        importUtil.setCssList(cssList);
+        importUtil.importCss();
         // 商品详情页搜券程序
         Util.run(SingleProductList, new SingleProduct());
+
     });
 
     $(window).on('load', function () {
@@ -227,23 +278,24 @@ SingleProduct.prototype.run = function (website) {
         console.error(`${id} or ${title} error!`);
         return;
     }
-    // 第一次请求api
+
+    // 第一次请求api   
     $.ajax({
-        url: 'https://www.skypesky.cn/api/search',
-        method: "POST",
+        url: config.requestApi.url,
+        method: config.requestApi.method,
         data: {
             title: title,
             id: id
         },
         success: (res) => {
-            if (res && res.flag) {  // 优惠券存在
+            if (res && res.flag) { // 优惠券存在                
                 // 更新discountIcon
                 this.updateDiscountIcon("查找成功! " + res.data.resultInfo.couponInfo);
                 this._discountIcon.attr('onclick', 'window.open("' + res.data.spreadUrl + '")');
                 // 更新qrcode
                 this.updateQrcode(res.data.spreadUrl);
                 $(this._discountIcon).before(this._qrcode);
-            } else {    // 优惠券不存在
+            } else { // 优惠券不存在
                 // 更新discountIcon
                 this.updateDiscountIcon('优惠券逃跑了*_*');
                 this._discountIcon.removeAttr('onclick');
@@ -261,14 +313,14 @@ SingleProduct.prototype.run = function (website) {
         }
         // 请求api
         $.ajax({
-            url: 'https://www.skypesky.cn/api/search',
-            method: "POST",
+            url: config.requestApi.url,
+            method: config.requestApi.method,
             data: {
                 title: title,
                 id: id
             },
             success: (res) => {
-                if (res != null && res.flag) {  // 优惠券存在
+                if (res != null && res.flag) { // 优惠券存在
                     // 更新discountIcon
                     this.updateDiscountIcon("查找成功! " + res.data.resultInfo.couponInfo);
                     // 设置跳转的链接
@@ -276,7 +328,7 @@ SingleProduct.prototype.run = function (website) {
                     // 更新qrcode
                     this.updateQrcode(res.data.spreadUrl);
                     $(this._discountIcon).before(this._qrcode);
-                } else {    // 优惠券不存在
+                } else { // 优惠券不存在
                     // 更新discountIcon
                     this.updateDiscountIcon('优惠券逃跑了*_*');
                     this._discountIcon.removeAttr('onclick');
@@ -296,23 +348,13 @@ SingleProduct.prototype.run = function (website) {
         }
     });
 
-    // // show qrcode
-    // $('#skypesky-discountIcon').bind('mouseenter', function (event) {
-    //     $('#skypesky-qrcode').show();
-    // });
-
-    // // hide qrcode
-    // $('#skypesky-discountIcon').bind('mouseleave', function (event) {
-    //     $('#skypesky-qrcode').hide();
-    // });
-
 };
 
 /*
-** @desc: 创建qrcode
-** @param: text => 扫描链接
-** @return: 返回qrcode
-*/
+ ** @desc: 创建qrcode
+ ** @param: text => 扫描链接
+ ** @return: 返回qrcode
+ */
 SingleProduct.prototype.createQrcode = function (text = 'http://weixin.qq.com/r/8DqNlTXEc2gMrXH292-i') {
 
     text = Util.toUtf8(text);
@@ -343,29 +385,29 @@ SingleProduct.prototype.createQrcode = function (text = 'http://weixin.qq.com/r/
     return this._qrcode;
 };
 /*
-** @desc: 更新qrcode
-** @param: text => 扫描链接
-** @return: 返回qrcode
-*/
+ ** @desc: 更新qrcode
+ ** @param: text => 扫描链接
+ ** @return: 返回qrcode
+ */
 SingleProduct.prototype.updateQrcode = function (text) {
     this.removeQrcode();
     this.createQrcode(text);
     return this._qrcode;
 };
 /*
-** @desc: 移除qrcode
-** @param:
-** @return:
-*/
+ ** @desc: 移除qrcode
+ ** @param:
+ ** @return:
+ */
 SingleProduct.prototype.removeQrcode = function () {
     this._qrcode.remove();
 };
 
 /*
-** @desc: 创建discountIcon
-** @param:  text => 显示的文本信息
-** @return: 返回discountIcon
-*/
+ ** @desc: 创建discountIcon
+ ** @param:  text => 显示的文本信息
+ ** @return: 返回discountIcon
+ */
 SingleProduct.prototype.createDiscountIcon = function (text = '点我搜券') {
 
     // 设置id
@@ -401,10 +443,10 @@ SingleProduct.prototype.createDiscountIcon = function (text = '点我搜券') {
     return this._discountIcon;
 };
 /*
-** @desc: 更新discountIcon
-** @param: text => 显示的文本信息
-** @return: 返回discountIcon
-*/
+ ** @desc: 更新discountIcon
+ ** @param: text => 显示的文本信息
+ ** @return: 返回discountIcon
+ */
 SingleProduct.prototype.updateDiscountIcon = function (text) {
     this._discountIcon.text(text);
     return this._discountIcon;
@@ -413,13 +455,17 @@ SingleProduct.prototype.updateDiscountIcon = function (text) {
 // 商品搜索处理类
 function SearchProduct() {
     this._discountTag = null;
+    // 统计数据
+    this._statistic = new Statistic();
+    // 搜索的商品数
+    this._number = 0;
 };
 
 /*
-** @desc: 创建discountTag
-** @param: text => 显示的文本信息
-** @return: 返回discountTag
-*/
+ ** @desc: 创建discountTag
+ ** @param: text => 显示的文本信息
+ ** @return: 返回discountTag
+ */
 SearchProduct.prototype.createDiscountTag = function (text) {
     let id = 'skypesky-discountTag';
     // create tag
@@ -441,7 +487,7 @@ SearchProduct.prototype.createDiscountTag = function (text) {
         'font-size': '14px',
         'white-space': 'normal',
         'color': '#fff',
-        'background-color': '#FF2220',
+        'background-color': '#DC143C',
         'display': 'inline-block',
         'text-align': 'center',
         'z-index': '8'
@@ -453,19 +499,65 @@ SearchProduct.prototype.createDiscountTag = function (text) {
 // 运行函数
 SearchProduct.prototype.run = function (website) {
 
-    // 当用户翻页时,也能正常搜券
-    this.changePageRun();
+    // 添加右键菜单    
+    $.contextMenu({
+        selector: 'body',
+        callback: (key, options) => {
+            if (key == "showSome") {
+                // 仅显示优惠券信息
+                iziToast.success({
+                    message: "仅显示优惠券信息!",
+                    position: "bottomLeft"
+                });
+                this.onlyShowDiscount();
+            } else if (key == "showAll") {
+                iziToast.success({
+                    message: "显示所有信息!",
+                    position: "bottomLeft"
+                });
+                this.showAll();
+            } else if (key == "feedback") {
+                // this.feedback();
+                iziToast.error({
+                    message: "此功能暂未开放!",
+                    position: "bottomLeft"
+                });
+            } else {
+                console.log("选择无效!")
+            }
+        },
+        items: {
+            "showSome": {
+                name: "仅显示优惠券信息",
+            },
+            "line1": "--------------------",
+            "showAll": {
+                name: "显示所有信息",
+            },
+            "line2": "--------------------",
+            "feedback": {
+                name: "反馈",
+            }
+        }
+    });
 
+    // 当用户翻页时,也能正常搜券
+    this.changePageRun(website);
+
+    // 获取信息
     let idList = $(website.id.selector);
     let titleList = $(website.title.selector);
     let imageList = $(website.image.selector);
+
+    // 获取商品总数
+    this._number = idList.length;
 
     // console.log(idList.length, titleList.length, imageList.length);
 
     for (let i = 0; i < idList.length; ++i) {
         // 获取id
         let id = !website.id.rule ? $.trim($(idList[i]).attr(website.id.attr)) : $.trim($(idList[i]).attr(website.id.attr).match(website.id.rule).toString());
-        // 获取标题
+        // 获取标题(去除左右的空格)
         let title = $.trim($(titleList[i]).text());
 
         // 验证id和title
@@ -475,33 +567,92 @@ SearchProduct.prototype.run = function (website) {
         }
         // 请求api
         $.ajax({
-            url: 'https://www.skypesky.cn/api/search',
-            method: "POST",
+            url: config.requestApi.url,
+            method: config.requestApi.method,
             data: {
                 title: title,
                 id: id
             },
             success: (res) => {
+
                 if (res && res.flag) { // 优惠券存在
+                    // 成功的请求数
+                    this._statistic.successCount++;
+
                     // 创建标签显示优惠信息
                     this.createDiscountTag(res.data.resultInfo.couponInfo);
                     // 设置需要跳转的链接
                     this._discountTag.attr('onclick', 'window.open("' + res.data.spreadUrl + '")');
                     $(imageList[i]).append(this._discountTag);
+
+
+                    $($(website.product.selector)[i]).addClass(config.successClassTag);
                 } else { //优惠券不存在
-                    console.info("sorry discount exsit");
+
+                    // 失败的请求数
+                    this._statistic.errorCount++;
+
+                    $($(website.product.selector)[i]).addClass(config.errorClassTag);
                 }
             }
         });
+
+
     }
 
-};
-/*
-** @desc: 定时检测网站路径的变化,当网站的路径变化时,再次运行搜券程序
-** @param: website => 网站配置项
-**/
-SearchProduct.prototype.changePageRun = function (website) {
+    // 找到优惠券给出提示
+    let task = setInterval(() => {
+        if (this._statistic.getAllCount() == idList.length) {
+            clearInterval(task);
+            iziToast.info({
+                message: `已找到${this._statistic.successCount}张商品优惠券`,
+                position: "bottomLeft"
+            });
+        }
+    }, 100);
 
+};
+
+/**
+ ** @desc: 仅显示优惠券信息
+ ** @param: 
+ ** @return:
+ */
+SearchProduct.prototype.onlyShowDiscount = function () {
+
+    console.log("onlyShowDiscount");
+    let task = setInterval(() => {
+        if (this._statistic.getAllCount() == this._number) {
+            clearInterval(task);
+            const errorProductList = $(`.${config.errorClassTag}`);
+            console.log("errorProductList: " + errorProductList.length);
+            errorProductList.hide();
+        }
+    }, 100);
+}
+
+/**
+ ** @desc: 显示所有信息(不管有没有优惠券)
+ ** @param: 
+ ** @return:
+ */
+SearchProduct.prototype.showAll = function () {
+    console.log("showAll");
+    let task = setInterval(() => {
+        if (this._statistic.getAllCount() == this._number) {
+            clearInterval(task);
+            const errorProductList = $(`.${config.errorClassTag}`);
+            console.log("errorProductList: " + errorProductList.length);
+            errorProductList.show();
+        }
+    }, 100);
+}
+
+/*
+ ** @desc: 定时检测网站路径的变化,当网站的路径变化时,再次运行搜券程序
+ ** @param: website => 网站配置项
+ */
+SearchProduct.prototype.changePageRun = function (website) {
 
     // 获取初始的url
     let originUrl = window.location.href;
@@ -509,12 +660,28 @@ SearchProduct.prototype.changePageRun = function (website) {
     let task = setInterval(() => {
         // 用户切换商品页,导致url发送变化
         if (originUrl != window.location.href) {
+            clearInterval(task);
             originUrl = window.location.href;
+            // 清空数据
+            this.clear();
             // 再次执行搜券函数
             this.run(website);
         }
-    }, 1000);
+    }, 100);
+
 };
+
+/*
+ ** @desc: 清除一些参数
+ ** @param:
+ ** @return:
+ */
+SearchProduct.prototype.clear = function () {
+    // 清除统计数据
+    this._statistic.clear();
+    // 搜索的商品数置为0
+    this._number = 0;
+}
 
 // 工具类
 const Util = {
@@ -529,10 +696,10 @@ const Util = {
         }
         return -1;
     },
+
     // 执行配置
     run: function (configList, object) {
         let index = this.select(configList);
-        console.log("index: " + index);
         if (index != -1) { //匹配成功
             console.log("匹配成功! " + configList[index].description);
             object.run(configList[index]);
@@ -565,6 +732,7 @@ const Util = {
 
 // 验证工具类
 const Validate = {
+
     // 验证id
     checkId: function (id) {
         // id不合法或者不是纯数字,返回false
@@ -573,6 +741,7 @@ const Validate = {
         }
         return true;
     },
+
     // 验证title
     checkTitle: function (title) {
         // title不合法返回false
@@ -581,8 +750,64 @@ const Validate = {
         }
         return true;
     },
+
     checkIdAndTitle: function (id, title) {
         // id, title需要同时满足条件
         return (this.checkId(id) && this.checkTitle(title));
     },
 };
+
+// 统计数据
+function Statistic() {
+    this.successCount = 0;
+    this.errorCount = 0;
+}
+/*
+ ** @desc: 清空统计数据
+ ** @param:
+ ** @return:
+ */
+Statistic.prototype.clear = function () {
+    this.successCount = 0;
+    this.errorCount = 0;
+}
+/*
+ ** @desc: 获取总的统计数
+ ** @param:
+ ** @return: 返回总的统计数
+ */
+Statistic.prototype.getAllCount = function () {
+    return this.successCount + this.errorCount;
+}
+
+/*
+ ** @desc: 获取成功率
+ ** @param:
+ ** @return: 返回统计的成功率,保留两位小数
+ */
+Statistic.prototype.getSuccessRate = function () {
+    return (this.successCount / this.getAllCount()).toFixed(2);
+}
+
+// 导入样式库
+const importUtil = {
+
+    cssList: [],
+
+    importCss: function () {
+        let styles = "";
+        for (let i = 0; i < this.cssList.length; ++i) {
+            styles += GM_getResourceText(this.cssList[i]);
+        }
+        GM_addStyle(styles);
+    },
+
+    setCssList: function (cssList) {
+        this.cssList = cssList;
+    },
+
+    clear: function () {
+        this.cssList = null;
+    }
+
+}

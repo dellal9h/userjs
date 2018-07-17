@@ -6,20 +6,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
-    <link href="https://cdn.bootcss.com/font-awesome/3.0.1/css/font-awesome-ie7.min.css" rel="stylesheet">
-    <link href="https://cdn.bootcss.com/font-awesome/3.0.1/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
 </head>
 
 <body>
     <span class="icon-edit">ss</span>
 </body>
 <script>
-    window.onload = function () {
-        iziToast.success({
-            message: 'I am a basic toast message!',
-            position: "topRight"
-        });
-    }
+    $(function() {
+        $.ajax({
+            url: "http://www.rs05.com/search.php",
+            method: "post",
+            data: {
+                s: "阿甘正传"
+            },
+            success: function(result) {
+                console.log(result);
+            }
+        })
+    });
 </script>
 
 </html>

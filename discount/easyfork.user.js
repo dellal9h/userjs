@@ -1,11 +1,16 @@
 // ==UserScript==
-// @name         [skypesky 出品]支持手机扫描二维码领取优惠券 淘宝天猫购物优惠券 优惠券 省钱必备工具 最新版(2018-07-15) 
+// @name         [skypesky 出品] 扫描二维码领取优惠券 淘宝天猫购物优惠券(2018-07-17) 
 // @author       skypesky
 // @collaborator liang
 // @namespace    http://www.skypesky.cn
-// @version      18.06.24
+// @version      18.07.17
 // @description  帮助淘宝天猫用户查询当前商品的优惠券
 // @updateURL    https://greasyfork.org/scripts/40146-taobao-%E6%B7%98%E5%AE%9D%E5%A4%A9%E7%8C%AB%E8%B4%AD%E7%89%A9%E5%8A%A9%E6%89%8B-%E4%BC%98%E6%83%A0%E5%88%B8%E5%8A%A9%E6%89%8B-%E6%94%AF%E6%8C%81%E6%89%AB%E7%A0%81%E9%A2%86%E5%88%B8-%E7%9C%81%E9%92%B1%E5%BF%85%E5%A4%87%E5%B7%A5%E5%85%B7-%E6%9C%80%E6%96%B0%E7%89%88-2018-05-18-skypesky/code/taobao%20%E6%B7%98%E5%AE%9D%E5%A4%A9%E7%8C%AB%E8%B4%AD%E7%89%A9%E5%8A%A9%E6%89%8B%20%E4%BC%98%E6%83%A0%E5%88%B8%E5%8A%A9%E6%89%8B%20%E6%94%AF%E6%8C%81%E6%89%AB%E7%A0%81%E9%A2%86%E5%88%B8%20%E7%9C%81%E9%92%B1%E5%BF%85%E5%A4%87%E5%B7%A5%E5%85%B7%20%E6%9C%80%E6%96%B0%E7%89%88(20180518)%20%5Bskypesky%5D.user.js
+
+
+// @connect      *
+// @grant        GM_getResourceText
+// @grant        GM_addStyle
 
 // ==========================详情页===========================
 // @include      http*://s.taobao.com/search*
@@ -24,9 +29,7 @@
 // @resource     toastr https://cdn.bootcss.com/izitoast/1.3.0/css/iziToast.min.css
 // @resource     contexMenu https://cdn.bootcss.com/jquery-contextmenu/2.6.1/jquery.contextMenu.min.css
 
-// @connect      *
-// @grant        GM_getResourceText
-// @grant        GM_addStyle
+
 
 // ==========================js============================
 // @require      https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js
@@ -39,7 +42,11 @@
 
 const config = {
     successClassTag: `skypesky-search-success`,
-    errorClassTag: `skypesky-search-error`
+    errorClassTag: `skypesky-search-error`,
+    requestApi: {
+        url: "https://skypesky.cn/api/search",
+        method: "POST"
+    }
 };
 
 
@@ -268,10 +275,11 @@ SingleProduct.prototype.run = function (website) {
         console.error(`${id} or ${title} error!`);
         return;
     }
-    // 第一次请求api
+
+    // 第一次请求api   
     $.ajax({
-        url: 'https://www.skypesky.cn/api/search',
-        method: "POST",
+        url: config.requestApi.url,
+        method: config.requestApi.method,
         data: {
             title: title,
             id: id
@@ -302,8 +310,8 @@ SingleProduct.prototype.run = function (website) {
         }
         // 请求api
         $.ajax({
-            url: 'https://www.skypesky.cn/api/search',
-            method: "POST",
+            url: config.requestApi.url,
+            method: config.requestApi.method,
             data: {
                 title: title,
                 id: id
@@ -556,17 +564,13 @@ SearchProduct.prototype.run = function (website) {
         }
         // 请求api
         $.ajax({
-            url: 'https://www.skypesky.cn/api/search',
-            method: "POST",
+            url: config.requestApi.url,
+            method: config.requestApi.method,
             data: {
                 title: title,
                 id: id
             },
             success: (res) => {
-
-                console.log(`=====current is ${i}========`);
-                console.log(res);
-                console.log("===========================");
 
                 if (res && res.flag) { // 优惠券存在
                     // 成功的请求数
