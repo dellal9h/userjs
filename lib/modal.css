@@ -1,0 +1,79 @@
+/* common */
+.sky-left {
+    float: left;
+}
+
+.sky-right {
+    float: right;
+}
+
+.sky-clearfix {
+    clear: both;
+}
+
+.sky-text-center {
+    text-align: center;
+}
+
+.sky-block-center {
+    margin: 0px auto;
+}
+
+:before, :after {
+    box-sizing: border-box;
+}
+/* /common */
+
+/* tab */
+.sky-tab-menu {
+    height: auto;
+    padding-left: 0px;
+    margin-bottom: 0px;
+    margin-top: 0px;
+    list-style: none;    
+}
+
+.sky-tab-menu::before, .sky-tab-menu:after {
+    display: table;
+    content: "";
+}
+
+.sky-tab-menu:after {
+    clear: both;
+}
+
+.sky-tab-menu:after {
+    display: block;
+}
+
+.sky-tab-menu > li {
+    float: left;
+    position: relative;
+    display: block;
+    padding: 10px;
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+}
+
+.sky-tab-menu > li.active {
+    border: 1px solid #ddd;
+    border-bottom: transparent;
+}
+
+.sky-tab-menu > li > a:link {
+    text-decoration: none;
+}
+
+.sky-tab-list > .sky-tab-item{
+    display: none;
+}
+
+.sky-tab-list > .sky-tab-item.active {
+    display: block;
+}
+/* /tab */
+
+
+
+
+

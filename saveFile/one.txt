@@ -1,0 +1,59 @@
+================================================
+need jquery
+
+1. setting param: {
+        "url": "http://workwebsite",
+        "rule": //,
+	"shipId": "13359609",
+	"ownPlant": "0",
+	"destination": {
+		"startPageNumber": 23,
+		"endPageNumber": 32
+	},
+	"scan": "Anpeoilen"
+}
+
+
+2. readConfig
+3. getConfig
+
+var Server = function() {
+	run: function(website) {
+		// 保存下次要跳转的链接
+		// one step: save text to your phone
+		saveTextToPhone();
+		// two step: check list is null
+		let urlList = $.cookie('urlList');
+		if(urlList == null || urlList.length <= 0) {
+			stop();
+			return ;
+		}
+		// three step
+		window.location.href = "new url";
+		
+	
+	},
+	// save text to phone
+	saveTextToPhone: function() {
+		let text = this.getText();
+		saveApi(text);
+	},
+	createUrl: function(website) {
+		let urlList = new Array();
+		for(let i = pageStartNumber; i <= pageEndNumber; ++i) {
+			urlList[i - pageStartNumber] = newUrl;
+		} 
+		return urlList;
+	}
+	getText: function () {
+		return $('body').text();	
+	},
+	stop: function() {
+		
+	}
+}
+================================================
+
+1. 配置文件
+2. 跳转页面
+3. 保存文件,问一下当前页面是否是最后一页呢?或者说问cookie的队列,如果是,结束运行,否则更新跳转链接,执行3
