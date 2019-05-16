@@ -1,35 +1,34 @@
 // ==UserScript==
-// @namespace    https://openuserjs.org/user/skypesky
-// @name         (skypesky.cn) 淘宝天猫购物优惠券 搜券助手 省钱必备工具
+// @name         [skypesky 出品] 扫描二维码领取优惠券 淘宝天猫购物优惠券(2018-07-17) 
 // @author       skypesky
 // @collaborator liang
-// @copyright    2018, skypesky (https://openuserjs.org/users/skypesky)
-// @version      18.09.14
-// @description  [skypesky 出品]支持手机扫描二维码领取优惠券 淘宝天猫购物优惠券 优惠券 省钱必备工具 最新版(2018-09-14) 
+// @namespace    http://www.skypesky.cn
+// @version      18.07.17
+// @description  帮助淘宝天猫用户查询当前商品的优惠券
 
-// @license Apache-2.0
 
 // @connect      *
 // @grant        GM_getResourceText
 // @grant        GM_addStyle
 
-
-// ==========================详情页===========================
+// ==========================搜索页===========================
 // @include      http*://s.taobao.com/search*
 // @include      http*://list.tmall.com*
 // @include      http*://list.tmall.hk/search_product.htm*
 // @include      http*://www.tmall.com/*
 
-// ==========================搜索页============================
+// ==========================详情页============================
 // @include      http*://item.taobao.com/*
 // @include      http*://detail.tmall.com/*
 // @include      http*://chaoshi.detail.tmall.com/*
 // @include      http*://detail.tmall.hk/*
 // @include      http*://detail.yao.95095.com/item.htm*
 
+
 // ==========================资源============================
 // @resource     toastr https://cdn.bootcss.com/izitoast/1.3.0/css/iziToast.min.css
 // @resource     contexMenu https://cdn.bootcss.com/jquery-contextmenu/2.6.1/jquery.contextMenu.min.css
+
 
 
 // ==========================js============================
@@ -39,8 +38,7 @@
 // @require      https://cdn.bootcss.com/jquery-contextmenu/2.6.1/jquery.contextMenu.min.js
 // @require      https://cdn.bootcss.com/izitoast/1.3.0/js/iziToast.min.js
 
-
-// ==/UserScript== 
+// ==/UserScript==
 
 
 // 动态配置
@@ -903,12 +901,76 @@ const Util = {
 
 $(function () {
 
+
+    let style = `/* discount.css */
+    .sky-discountTag {
+        position: absolute;
+        right: 0px;
+        top: 0px;
+        padding: 0.5em 0.2em;
+        width: 80px;
+        height: auto;
+        line-height: 14px;
+        font-family: "Hiragino Sans GB;microsoft yahei;sans-serif";
+        font-size: 14px;
+        white-space: normal;
+        color: #fff;
+        background-color: #DC143C;
+        display: inline-block;
+        text-align: center;
+        z-index: 8;
+    }
+
+    .sky-discountButton {
+        position: fixed;
+        left: 0px;
+        bottom: 3rem;
+        margin-left: 5px;
+        padding: 8px 6px;
+        width: 90px;
+        height: auto;
+        line-height: 24px;
+        font-family: "Hiragino Sans GB;microsoft yahei;sans-serif";
+        font-size: 12px;
+        white-space: normal;
+        color: #fff;
+        background-color: #0e90d2;
+        border-color: #0e90d2;
+        display: inline-block;
+        border-radius: 1em;
+        border: 1px solid transparent;
+        text-align: center;
+        z-index: 666;
+    }
+
+    .sky-qrcode {
+        position: fixed;
+        left: 5px;
+        bottom: 10rem;
+        z-index: 666;
+    }
+
+    .sky-hide {
+        display: none;
+    }
+
+    .sky-position-relative {
+        position: relative;
+    }`;
+
+    GM_addStyle(style);
+
+    iziToast.success({
+        message: config.server.searchProduct.message.contextMenu.showAll,
+        position: "bottomLeft"
+    });
+
     // 商品详情
     Controller.run(productDetailConfigList, function (websiteConfig) {
         DetailServer.run(websiteConfig);
     });
 
-    $(window).load(function () {
+    $(window).on(`load`, function () {
         // 搜索程序    
         Controller.run(searchProductConfigList, function (websiteConfig) {
             SearchServer.run(websiteConfig);

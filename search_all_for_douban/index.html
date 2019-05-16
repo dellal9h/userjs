@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <button style="padding: 6px 12px; background-color: #fff; border: 1px solid #ccc; background-color: rgb(74, 170, 74); color: #fff;"
+        onclick="window.open('https://baidu.com')">下载</button>
+</body>
+
+<script>
+    window.onload = function () {
+        let rule = /\/\/music.163.com\/(#\/)?song\?id=/;
+        let str1 = "https://music.163.com/#/song?id=1345163233";
+        let str2 = "https://music.163.com/song?id=1345163233";
+        console.log(rule.test(str1), rule.test(str2));
+    }
+</script>
+
+</html>

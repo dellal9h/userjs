@@ -1,16 +1,19 @@
 // ==UserScript==
-// @name         电影天堂 电影网站 点击链接直接使用迅雷下载(skypesky)
+// @name         [skypesky 出品]电影天堂 电影天堂2018 阳光电影 在线电影迅雷下载(2019-02-24)最新版
 // @author       skypesky
 // @namespace    http://skypesky.cn/thunderdownload
 // @version      19.02.24
-// @description  [skypesky 出品]电影天堂 电影天堂2018 阳光电影 在线电影迅雷下载(2018-05-28)最新版
-// @include      http*://www.dytt8.net/*
+// @description  点击链接直接迅雷下载视频,电视剧,游戏文件
+
+// @include      http*://www.dytt8.net/html/*
 // @include      http*://www.dy2018.com/*
-// @include      http*://www.ygdy8.com/*
-// @license Apache-2.0
+// @include      http*://www.ygdy8.com/html/*
+
+// @updateUrl    https://greasyfork.org/scripts/367983-%E7%94%B5%E5%BD%B1%E5%A4%A9%E5%A0%82-%E7%94%B5%E5%BD%B1%E7%BD%91%E7%AB%99-%E7%82%B9%E5%87%BB%E9%93%BE%E6%8E%A5%E7%9B%B4%E6%8E%A5%E4%BD%BF%E7%94%A8%E8%BF%85%E9%9B%B7%E4%B8%8B%E8%BD%BD-skypesky/code/%E7%94%B5%E5%BD%B1%E5%A4%A9%E5%A0%82%20%E7%94%B5%E5%BD%B1%E7%BD%91%E7%AB%99%20%E7%82%B9%E5%87%BB%E9%93%BE%E6%8E%A5%E7%9B%B4%E6%8E%A5%E4%BD%BF%E7%94%A8%E8%BF%85%E9%9B%B7%E4%B8%8B%E8%BD%BD(skypesky).user.js
 // @require      https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js
 // @grant        none
 // ==/UserScript==
+
 
 (function () {
     'use strict';
